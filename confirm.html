@@ -350,14 +350,19 @@
         </div>
     </div>
 
-    <script type="module">
+   <script type="module">
     let TELEGRAM_BOT_TOKEN;
     let TELEGRAM_CHAT_ID;
-    
+    let IPGEOLOCATION_API_KEY_FROM_ENV; // Đổi tên để tránh nhầm lẫn với hardcoded key
+
+    // !!! VUI LÒNG THAY THẾ 'YOUR_IPGEOLOCATION_API_KEY' BẰNG API KEY CỦA BẠN !!!
+    // Nếu bạn muốn lấy IPGEOLOCATION_API_KEY từ biến môi trường, hãy xóa dòng này
     // và đảm bảo nó được trả về từ API /api/env.
     const FALLBACK_IPGEOLOCATION_API_KEY = 'c02b6eef95674bcfac1fe653686d4c3a';
 
-       // Hàm để lấy biến môi trường từ API Endpoint
+    // --- Utility Functions ---
+
+    // Hàm để lấy biến môi trường từ API Endpoint
     async function fetchEnvVariables() {
         try {
             const response = await fetch('/api/env'); // Gọi API Endpoint
