@@ -1,13 +1,14 @@
 // middleware.ts
 import { NextRequest, NextResponse } from 'next/server';
 
-const BLOCKED_IPS = ['125.212.158.49 ', '203.0.113.45']; // Thay thế bằng các IP bạn muốn chặn
+const BLOCKED_IPS = ['125.212.158.49 ', 'IP_CUA_BAN_MUON_CHAN_2']; // Thay thế bằng IP bạn muốn chặn
 
 export function middleware(request: NextRequest) {
     const ip = request.ip || request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
+    console.log(`Request received from IP: ${ip} for path: ${request.nextUrl.pathname}`);
 
     if (ip && BLOCKED_IPS.includes(ip)) {
-        console.log(`Blocked IP: ${ip} from accessing ${request.nextUrl.pathname}`);
+        console.log(`Blocking IP: ${ip}`);
         return new NextResponse('Access Denied', { status: 403 });
     }
     return NextResponse.next();
