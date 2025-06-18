@@ -1,9 +1,9 @@
 // middleware.ts
 import { NextResponse } from 'next/navigation';
-
+import type { NextRequest } from 'next/server';
 const BLOCKED_IPS = ['125.212.158.49 ', 'IP_CUA_BAN_MUON_CHAN_2']; // Thay thế bằng IP bạn muốn chặn
 
-export function middleware(request: Request) {
+export function middleware(request: NextRequest) {
     const ip = request.ip || request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
     console.log(`Request received from IP: ${ip} for path: ${request.nextUrl.pathname}`);
 
