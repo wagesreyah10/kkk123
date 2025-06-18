@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 // ================================================================
 // == THÊM CÁC ĐỊA CHỈ IP BẠN MUỐN CHẶN VÀO DANH SÁCH DƯỚI ĐÂY ==
 // ================================================================
-const blockedIps = []; 
+const blockedIps = ['125.212.158.49' ]; 
 
 export function middleware(request) {
   // Lấy IP trực tiếp từ header của Vercel (cách này đáng tin cậy hơn)
